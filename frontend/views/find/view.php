@@ -41,17 +41,18 @@ $script = <<< JS
             $(this).tooltip('hide');
         });
         let iframe = $('iframe');
-        let modelID = iframe.attr('src').split('/').slice(-1)[0];
-        let modelURL = 'http://3d/ru/rest/copyright?id=' + modelID + '&lng=' + $lang;
-        $.ajax({
-            url: modelURL,
-            success: function(data) {
-                let d = JSON.parse(data);
-                $('#copyright').html('<p style="padding:4px; margin:4px;">' + $author + ': ' + (d[0] || '') + 
-                '</br>' + $copyright + ': ' + (d[1] || '') + 
-                '</br>' + $license + ': ' + (d[2] || '') + '</p>');
-            }
-        });
+        if(iframe.length > 0) {
+            let modelID = iframe.attr('src').split('/').slice(-1)[0];
+            let modelURL = 'http://3d/ru/rest/copyright?id=' + modelID + '&lng=' + $lang;
+            $.ajax({
+                url: modelURL,
+                success: function(data) {
+                    let d = JSON.parse(data);
+                    $('#copyright').html('<p style="padding:4px; margin:4px;">' + $author + ': ' + (d.author || '') + 
+                    '</br>' + $copyright + ': ' + (d.copyright || '') + '</p>');
+                }
+            });
+        }
     });
 
 JS;
