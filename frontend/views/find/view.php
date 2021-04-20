@@ -17,6 +17,10 @@ $this->params['breadcrumbs'] = [
     ['label' => $find->category->name, 'url' => ['category/view', 'id' => $find->category->id]],
     $this->title,
 ];
+$lang = json_encode(Yii::$app->language);
+$author = json_encode(Yii::t('find', 'Authors'));
+$copyright = json_encode(Yii::t('find', 'Copyright'));
+$license = json_encode(Yii::t('find', 'License'));
 $script = <<< JS
     // function htmlDecode(input){
     //     var e = document.createElement('div');
@@ -35,7 +39,19 @@ $script = <<< JS
         $(".tab-header")
         .click(function() {
             $(this).tooltip('hide');
-        });        
+        });
+        let iframe = $('iframe');
+        let modelID = iframe.attr('src').split('/').slice(-1)[0];
+        let modelURL = 'http://3d/ru/rest/copyright?id=' + modelID + '&lng=' + $lang;
+        $.ajax({
+            url: modelURL,
+            success: function(data) {
+                let d = JSON.parse(data);
+                $('#copyright').html('<p style="padding:4px; margin:4px;">' + $author + ': ' + (d[0] || '') + 
+                '</br>' + $copyright + ': ' + (d[1] || '') + 
+                '</br>' + $license + ': ' + (d[2] || '') + '</p>');
+            }
+        });
     });
 
 JS;
@@ -289,6 +305,7 @@ if (!empty($find->publication)) {
             ]); ?>
         <?php else: ?>
             <?= $find->three_d ?>
+            <div id="copyright" style="width:100%"></div>
         <?php endif; ?>
     </div>
     <?php if (Yii::$app->user->can('manager')): ?>
